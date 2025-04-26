@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-// import 'package:text_to_speech/text_to_speech.dart';
+import 'package:text_to_speech/text_to_speech.dart';
 
 void main() async {
   // Ensure Flutter bindings are initialized
@@ -72,7 +72,7 @@ class TtsHelper {
   static final TtsHelper _instance = TtsHelper._internal();
   factory TtsHelper() => _instance;
 
-  // final TextToSpeech _tts = TextToSpeech();
+  final TextToSpeech _tts = TextToSpeech();
   bool _initialized = false;
 
   TtsHelper._internal();
@@ -89,8 +89,8 @@ class TtsHelper {
       await initialize();
     }
     // Set language to Urdu (ur-PK)
-    // _tts.setLanguage('ur-PK');
-    // _tts.speak(sentence);
+    _tts.setLanguage('ur-PK');
+    _tts.speak(sentence);
   }
 
   /// Speaks the given sentence in Pashto language.
@@ -99,8 +99,8 @@ class TtsHelper {
       await initialize();
     }
     // Set language to Pashto (ps-AF)
-    // _tts.setLanguage('ps-AF');
-    // _tts.speak(sentence);
+    _tts.setLanguage('ps-AF');
+    _tts.speak(sentence);
   }
 
   Future<void> speakUrdu(String sentence) async {
@@ -108,7 +108,7 @@ class TtsHelper {
       await initialize();
     }
 
-    // _tts.setLanguage('ur-PK');
-    // _tts.speak(sentence);
+    _tts.setLanguage('ur-PK');
+    _tts.speak(sentence);
   }
 }
