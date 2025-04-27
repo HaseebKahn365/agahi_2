@@ -1,4 +1,5 @@
 import 'package:agahi/language_support/sentences.dart';
+import 'package:agahi/screens/ecom/ecom_provider.dart';
 import 'package:agahi/screens/landing_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_tts/flutter_tts.dart';
@@ -10,8 +11,12 @@ void main() async {
 
   runApp(
     //using ChangeNotifierProvider to provide the language settings
-    ChangeNotifierProvider(
-      create: (context) => LanguageProvider(),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => LanguageProvider()),
+        ChangeNotifierProvider(create: (context) => TtsHelper()),
+        ChangeNotifierProvider(create: (context) => ShoppingProvider()),
+      ],
       child: const MyApp(),
     ),
   );
@@ -22,6 +27,10 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Provider.of<ShoppingProvider>(
+      context,
+      listen: false,
+    ).loadItems(); // Load shopping items from SharedPreferences
     return Consumer<LanguageProvider>(
       builder: (context, languageProvider, child) {
         final isUrdu = languageProvider.isUrdu;
@@ -259,9 +268,10 @@ class _ToggleContainersState extends State<ToggleContainers> {
   }
 }
 
-class TtsHelper {
+class TtsHelper extends ChangeNotifier {
   static final TtsHelper _instance = TtsHelper._internal();
   factory TtsHelper() => _instance;
+  bool isVoiceOn = true; // Default voice state
 
   final FlutterTts _tts = FlutterTts();
   bool _initialized = false;
@@ -277,10 +287,16 @@ class TtsHelper {
     }
   }
 
+  void toggleVoiceOnOff() {
+    isVoiceOn = !isVoiceOn;
+    notifyListeners();
+  }
+
   Future<void> speakAloud(String sentence) async {
     if (!_initialized) {
       await initialize();
     }
+    if (!isVoiceOn) return; // Don't speak if voice is off
     await _tts.setLanguage('ur-PK');
     await _tts.speak(sentence);
   }
@@ -289,6 +305,7 @@ class TtsHelper {
     if (!_initialized) {
       await initialize();
     }
+    if (!isVoiceOn) return; // Don't speak if voice is off
     await _tts.setLanguage('ps-AF');
     await _tts.speak(sentence);
   }
@@ -297,6 +314,7 @@ class TtsHelper {
     if (!_initialized) {
       await initialize();
     }
+    if (!isVoiceOn) return; // Don't speak if voice is off
     await _tts.setLanguage('ur-PK');
     await _tts.speak(sentence);
   }
