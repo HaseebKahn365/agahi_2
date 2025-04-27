@@ -84,6 +84,16 @@ class ShoppingScreen extends StatelessWidget {
                       },
                     ),
                   ),
+                  // clear the cart button
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: IconButton(
+                      icon: Icon(Icons.delete, color: Colors.white, size: 30),
+                      onPressed: () {
+                        provider.clearCart();
+                      },
+                    ),
+                  ),
                 ],
               ),
             ),

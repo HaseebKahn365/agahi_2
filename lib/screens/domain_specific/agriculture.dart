@@ -5,16 +5,20 @@ class AgricultureListView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        // Add your agriculture list items here
-        // show agri1 agri2 agri3 images
-        displayImageButton('assets/images/agri_care.png', context),
-        const SizedBox(height: 20),
-        displayImageButton('assets/images/leave_dis.jpg', context),
-        const SizedBox(height: 20),
-        displayImageButton('assets/images/seed_stor.jpg', context),
-      ],
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        spacing: 10,
+        children: [
+          // Add your agriculture list items here
+          // show agri1 agri2 agri3 images
+          displayImageButton('assets/images/agri_care.png', context),
+          const SizedBox(height: 20),
+          displayImageButton('assets/images/leave_dis.jpg', context),
+          const SizedBox(height: 20),
+          displayImageButton('assets/images/seed_stor.jpg', context),
+        ],
+      ),
     );
   }
 
@@ -48,9 +52,13 @@ class AgricultureListView extends StatelessWidget {
           // Implement your navigation logic here
         }
       },
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(10),
-        child: Image.asset(imagePath, fit: BoxFit.cover),
+      child: SizedBox(
+        height: 200,
+
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(10),
+          child: Image.asset(imagePath, fit: BoxFit.cover),
+        ),
       ),
     );
   }

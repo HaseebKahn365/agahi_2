@@ -84,14 +84,14 @@ class ListViewFor extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 20),
-            Text(
-              'Explore ${screenType.toString().split('.').last}',
-              style: const TextStyle(
-                fontSize: 24,
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
+            // Text(
+            //   'Explore ${screenType.toString().split('.').last}',
+            //   style: const TextStyle(
+            //     fontSize: 24,
+            //     color: Colors.white,
+            //     fontWeight: FontWeight.bold,
+            //   ),
+            // ),
 
             //colum widget for respective screen type
             if (screenType == ScreenType.education) EducationListView(),

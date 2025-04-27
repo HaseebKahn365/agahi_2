@@ -5,15 +5,19 @@ class HealthListView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        // Add your health list items here
-        displayImageButton('assets/images/health1.jpg', context),
-        const SizedBox(height: 20),
-        displayImageButton('assets/images/health2.jpg', context),
-        const SizedBox(height: 20),
-        displayImageButton('assets/images/health3.jpg', context),
-      ],
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        spacing: 10,
+        children: [
+          // Add your health list items here
+          displayImageButton('assets/images/health1.jpg', context),
+          const SizedBox(height: 20),
+          displayImageButton('assets/images/health2.jpg', context),
+          const SizedBox(height: 20),
+          displayImageButton('assets/images/health3.jpg', context),
+        ],
+      ),
     );
   }
 
@@ -41,9 +45,12 @@ class HealthListView extends StatelessWidget {
           );
         }
       },
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(10),
-        child: Image.asset(imagePath, fit: BoxFit.cover),
+      child: SizedBox(
+        height: 200,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(10),
+          child: Image.asset(imagePath, fit: BoxFit.cover),
+        ),
       ),
     );
   }

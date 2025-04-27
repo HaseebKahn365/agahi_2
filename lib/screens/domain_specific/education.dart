@@ -6,16 +6,20 @@ class EducationListView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        // Add your education list items here
-        //  show edu1 edu2 edu3 images
-        displayImageButton('assets/images/edu1.png', context),
-        const SizedBox(height: 20),
-        displayImageButton('assets/images/edu2.png', context),
-        const SizedBox(height: 20),
-        displayImageButton('assets/images/edu3.png', context),
-      ],
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        spacing: 10,
+        children: [
+          // Add your education list items here
+          //  show edu1 edu2 edu3 images
+          displayImageButton('assets/images/edu1.png', context),
+          const SizedBox(height: 20),
+          displayImageButton('assets/images/edu2.png', context),
+          const SizedBox(height: 20),
+          displayImageButton('assets/images/edu3.png', context),
+        ],
+      ),
     );
   }
 
@@ -35,9 +39,12 @@ class EducationListView extends StatelessWidget {
           ),
         );
       },
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(10),
-        child: Image.asset(imagePath, fit: BoxFit.cover),
+      child: SizedBox(
+        height: 200,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(10),
+          child: Image.asset(imagePath, fit: BoxFit.cover),
+        ),
       ),
     );
   }
