@@ -34,7 +34,7 @@ class MyApp extends StatelessWidget {
     return Consumer<LanguageProvider>(
       builder: (context, languageProvider, child) {
         final isUrdu = languageProvider.isUrdu;
-        final locale = isUrdu ? const Locale('ur') : const Locale('ps');
+        // final locale = isUrdu ? const Locale('ur') : const Locale('ps');
         final title = isUrdu ? Sentences.welcomeUrdu : Sentences.welcomePashto;
 
         return MaterialApp(

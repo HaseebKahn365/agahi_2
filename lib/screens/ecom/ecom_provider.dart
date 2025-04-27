@@ -33,6 +33,15 @@ class ShoppingProvider with ChangeNotifier {
     if (itemsString != null) {
       final List decoded = jsonDecode(itemsString);
       _items = decoded.map((e) => ShoppingItem.fromJson(e)).toList();
+      if (_items.isEmpty) {
+        _items = [
+          ShoppingItem(location: 'assets/images/ecom1.jpg', price: 100),
+          ShoppingItem(location: 'assets/images/ecom2.jpg', price: 600),
+          ShoppingItem(location: 'assets/images/ecom3.jpg', price: 300),
+        ];
+        log('Here are the default items: $_items');
+        await saveItems();
+      }
     } else {
       _items = [
         ShoppingItem(location: 'assets/images/ecom1.jpg', price: 100),
