@@ -1,11 +1,20 @@
 import 'package:agahi/language_support/sentences.dart';
+import 'package:agahi/screens/landing_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_tts/flutter_tts.dart';
+import 'package:provider/provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await TtsHelper().initialize();
-  runApp(const MyApp());
+
+  runApp(
+    //using ChangeNotifierProvider to provide the language settings
+    ChangeNotifierProvider(
+      create: (context) => LanguageProvider(),
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -13,15 +22,29 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      debugShowCheckedModeBanner: false,
+    return Consumer<LanguageProvider>(
+      builder: (context, languageProvider, child) {
+        final isUrdu = languageProvider.isUrdu;
+        final locale = isUrdu ? const Locale('ur') : const Locale('ps');
+        final title = isUrdu ? Sentences.welcomeUrdu : Sentences.welcomePashto;
 
-      theme: ThemeData(
-        brightness: Brightness.dark,
-        primarySwatch: Colors.indigo,
-      ),
-      home: const MyHomePage(title: 'Agahi App'),
+        return MaterialApp(
+          title: title,
+          debugShowCheckedModeBanner: false,
+          theme: ThemeData(
+            brightness: Brightness.dark,
+            primarySwatch: Colors.indigo,
+          ),
+          // supportedLocales: L10n.all,
+          // locale: locale,
+          // localizationsDelegates: [
+          //   GlobalMaterialLocalizations.delegate,
+          //   GlobalWidgetsLocalizations.delegate,
+          //   GlobalCupertinoLocalizations.delegate,
+          // ],
+          home: MyHomePage(title: title),
+        );
+      },
     );
   }
 }
@@ -32,27 +55,202 @@ class MyHomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    bool isUrdu = Provider.of<LanguageProvider>(context).isUrdu;
     return Scaffold(
-      appBar: AppBar(title: Text(title)),
       body: SizedBox(
         width: double.infinity,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            const Text('Welcome to Agahi App!'),
-            const SizedBox(height: 23),
-            ElevatedButton(
-              onPressed: () {
-                TtsHelper().speakUrdu(Sentences.welcomeUrdu);
-              },
-              child: const Text('Speak Urdu'),
+            //A BIGGER APP NAME TEXT
+            Text(
+              isUrdu ? Sentences.appNameUrdu : Sentences.appNamePashto,
+              style: const TextStyle(
+                fontSize: 32,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
             ),
-            ElevatedButton(
-              onPressed: () {
-                TtsHelper().speakAloud(Sentences.welcomePashto);
+            const SizedBox(height: 32),
+            Text(
+              title,
+              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 64),
+            //toggle coontainers
+            ToggleContainers(),
+
+            //next button
+            const SizedBox(height: 32),
+
+            GestureDetector(
+              onTap: () {
+                // Speak the selected language when the button is tapped
+                if (isUrdu) {
+                  TtsHelper().speakAloud(
+                    "${Sentences.appNameUrdu} ${Sentences.welcomeUrdu}",
+                  );
+                } else {
+                  TtsHelper().speakPashto(
+                    "${Sentences.appNamePashto} ${Sentences.welcomePashto}",
+                  );
+                }
               },
-              child: const Text('Speak Pashto'),
+              child: GestureDetector(
+                onTap: () {
+                  //navigate to landing screen
+                  Navigator.push(
+                    context,
+                    PageRouteBuilder(
+                      pageBuilder:
+                          (context, animation, secondaryAnimation) =>
+                              const LandingScreen(),
+                      transitionsBuilder: (
+                        context,
+                        animation,
+                        secondaryAnimation,
+                        child,
+                      ) {
+                        const begin = Offset(1.0, 0.0);
+                        const end = Offset.zero;
+                        const curve = Curves.ease;
+                        final tween = Tween(
+                          begin: begin,
+                          end: end,
+                        ).chain(CurveTween(curve: curve));
+                        return SlideTransition(
+                          position: animation.drive(tween),
+                          child: child,
+                        );
+                      },
+                    ),
+                  );
+                },
+                child: Container(
+                  width: 200,
+                  height: 50,
+                  decoration: BoxDecoration(
+                    color: Colors.transparent,
+                    border: Border.all(color: Colors.indigo, width: 2),
+                    borderRadius: BorderRadius.circular(18),
+                    boxShadow: const [],
+                  ),
+                  child: const Center(
+                    child: Icon(
+                      Icons.arrow_forward,
+                      color: Colors.white,
+                      size: 30,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// A pair of containers to toggle between Urdu and Pashto, styled for better UX
+class ToggleContainers extends StatefulWidget {
+  const ToggleContainers({super.key});
+
+  @override
+  _ToggleContainersState createState() => _ToggleContainersState();
+}
+
+class _ToggleContainersState extends State<ToggleContainers> {
+  bool _isUrdu = true;
+
+  @override
+  Widget build(BuildContext context) {
+    Provider.of<LanguageProvider>(context).isUrdu = _isUrdu;
+    // Speak the selected language when toggled
+    if (_isUrdu) {
+      TtsHelper().speakUrdu(Sentences.selectedLanguageUrdu);
+    } else {
+      TtsHelper().speakPashto(Sentences.selectedLanguagePashto);
+    }
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 24.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          _buildToggleButton(
+            label: 'اردو',
+            selected: _isUrdu,
+            onTap: () {
+              setState(() {
+                _isUrdu = true;
+                Provider.of<LanguageProvider>(
+                  context,
+                  listen: false,
+                ).changeLanguage(true);
+              });
+            },
+          ),
+          const SizedBox(width: 16),
+          _buildToggleButton(
+            label: 'پښتو',
+            selected: !_isUrdu,
+            onTap: () {
+              setState(() {
+                _isUrdu = false;
+                Provider.of<LanguageProvider>(
+                  context,
+                  listen: false,
+                ).changeLanguage(false);
+              });
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildToggleButton({
+    required String label,
+    required bool selected,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        width: 120,
+        height: 120,
+        duration: const Duration(milliseconds: 250),
+        padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
+        decoration: BoxDecoration(
+          color: selected ? Colors.indigo : Colors.grey[800],
+          borderRadius: BorderRadius.circular(18),
+          boxShadow:
+              selected
+                  ? [
+                    BoxShadow(
+                      color: Colors.indigo.withOpacity(0.4),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
+                    ),
+                  ]
+                  : [],
+          border: Border.all(
+            color: selected ? Colors.indigoAccent : Colors.grey[700]!,
+            width: 2,
+          ),
+        ),
+        child: Row(
+          children: [
+            const SizedBox(width: 8),
+            Text(
+              label,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                fontFamily: 'NotoNaskhArabic',
+              ),
             ),
           ],
         ),
@@ -101,5 +299,16 @@ class TtsHelper {
     }
     await _tts.setLanguage('ur-PK');
     await _tts.speak(sentence);
+  }
+}
+
+//provide for language settings
+
+class LanguageProvider with ChangeNotifier {
+  bool isUrdu = true; // Default language is Urdu
+
+  changeLanguage(bool isUrdu) {
+    this.isUrdu = isUrdu;
+    notifyListeners();
   }
 }

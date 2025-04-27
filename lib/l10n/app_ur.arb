@@ -1,0 +1,17 @@
+{
+    "language": "Urdu",
+    "@language": {
+        "type": "text",
+        "description": "The language of the app"
+    },
+    "greeting": "سلام",
+    "@greeting": {
+        "type": "text",
+        "description": "A greeting message in Urdu"
+    },
+    "farewell": "خدا حافظ",
+    "@farewell": {
+        "type": "text",
+        "description": "A farewell message in Urdu"
+    }
+}

@@ -1,0 +1,17 @@
+{
+    "language": "پښتو",
+    "@language": {
+        "type": "text",
+        "description": "The language of the app"
+    },
+    "greeting": "پخير راغلاى",
+    "@greeting": {
+        "type": "text",
+        "description": "A greeting message in Pashto"
+    },
+    "farewell": "خداى پامان",
+    "@farewell": {
+        "type": "text",
+        "description": "A farewell message in Pashto"
+    }
+}
