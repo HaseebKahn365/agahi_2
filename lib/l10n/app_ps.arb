@@ -9,9 +9,37 @@
         "type": "text",
         "description": "A greeting message in Pashto"
     },
+
     "farewell": "خداى پامان",
     "@farewell": {
         "type": "text",
         "description": "A farewell message in Pashto"
-    }
+    },
+
+    "loading": "بار کول",
+    "@loading": {
+        "type": "text",
+        "description": "Loading message in Pashto"
+    },
+        
+    "welcome": "خوش آمدید",
+    "@welcome": {
+        "type": "text",
+        "description": "A welcome message in Pashto"
+    },
+    "thank_you": "مننه",
+    "@thank_you": {
+        "type": "text",
+        "description": "A thank you message in Pashto"
+    },
+    "error": "غلطی",
+    "@error": {
+        "type": "text",
+        "description": "An error message in Pashto"
+    },
+    "loading": "بار کول",
+    "@loading": {
+        "type": "text",
+        "description": "Loading message in Pashto"
+    },
 }

@@ -14,4 +14,20 @@
         "type": "text",
         "description": "A farewell message in Urdu"
     }
+
+    "welcome": "خوش آمدید",
+    "@welcome": {
+        "type": "text",
+        "description": "A welcome message in Urdu"
+    },
+    "thank_you": "شکریہ",
+    "@thank_you": {
+        "type": "text",
+        "description": "A thank you message in Urdu"
+    },
+    "error": "غلطی",
+    "@error": {
+        "type": "text",
+        "description": "An error message in Urdu"
+    },
 }
