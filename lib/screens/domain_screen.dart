@@ -2,7 +2,6 @@ import 'package:agahi/consts/screen_types.dart';
 import 'package:agahi/screens/domain_specific/agriculture.dart';
 import 'package:agahi/screens/domain_specific/education.dart';
 import 'package:agahi/screens/domain_specific/health.dart';
-import 'package:agahi/screens/landing_screen.dart';
 import 'package:flutter/material.dart';
 
 class DomainScreen extends StatelessWidget {
@@ -24,24 +23,13 @@ class DomainScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             const SizedBox(height: 20),
-            Hero(
-              tag: 'logoutButton',
-              child: Align(
-                alignment: Alignment.topRight,
-                child: IconButton(
-                  icon: const Icon(Icons.logout, color: Colors.white, size: 60),
-                  onPressed: () {},
-                ),
-              ),
-            ),
+
             const SizedBox(height: 50),
             ListViewFor(screenType: screenType, imagePath: imagePath),
 
             const SizedBox(height: 20),
 
             Spacer(),
-
-            Hero(tag: 'voiceToggle', child: VoiceToggleWidget()),
           ],
         ),
       ),
