@@ -17,17 +17,7 @@ class LandingScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            const SizedBox(height: 20),
-            Hero(
-              tag: 'logoutButton',
-              child: Align(
-                alignment: Alignment.topRight,
-                child: IconButton(
-                  icon: const Icon(Icons.logout, color: Colors.white, size: 60),
-                  onPressed: () {},
-                ),
-              ),
-            ),
+            AppBarWidget(),
             SizedBox(height: 20),
             GridView.count(
               //turn off scroll
@@ -52,44 +42,33 @@ class LandingScreen extends StatelessWidget {
   }
 
   Widget _buildImageButton(String imagePath, BuildContext context) {
-    ScreenType selectedScreenType;
-    String label;
-
-    // Determine screen type and label based on imagePath
+    var selectedScreenType = ScreenType.education; // Default screen type
     switch (imagePath) {
       case 'assets/images/edu.png':
         selectedScreenType = ScreenType.education;
-        label = 'Education';
         break;
       case 'assets/images/agri.png':
         selectedScreenType = ScreenType.agriculture;
-        label = 'Agriculture';
         break;
       case 'assets/images/ecom.png':
         selectedScreenType = ScreenType.economy;
-        label = 'E-Commerce';
         break;
       case 'assets/images/health.png':
         selectedScreenType = ScreenType.health;
-        label = 'Health';
         break;
-      default:
-        // Handle default case or throw an error if needed
-        selectedScreenType = ScreenType.education; // Default fallback
-        label = 'Unknown';
     }
 
-    void navigateToScreen(ScreenType screenType, String imgPath) {
-      // If ecommerce image is clicked, navigate to ecommerce screen directly
-      if (imgPath == 'assets/images/ecom.png') {
-        // Match the image path used in the GridView
+    void navigateToScreen(selectedScreenType, String imagePath) {
+      // Implement your navigation logic here
+
+      //if ecommerce image is clicked, navigate to ecommerce screen without going to domain screen
+      if (imagePath == 'assets/images/ecom.png') {
+        // Navigate directly to the ecommerce screen
         Navigator.push(
           context,
           PageRouteBuilder(
-            // Ensure ShoppingScreen is imported and correct
             pageBuilder:
-                (context, animation, secondaryAnimation) =>
-                    const ShoppingScreen(), // Assuming ShoppingScreen exists
+                (context, animation, secondaryAnimation) => ShoppingScreen(),
             transitionsBuilder: (
               context,
               animation,
@@ -99,77 +78,109 @@ class LandingScreen extends StatelessWidget {
               const begin = Offset(0.0, 1.0);
               const end = Offset.zero;
               const curve = Curves.easeInOut;
+
               var tween = Tween(
                 begin: begin,
                 end: end,
               ).chain(CurveTween(curve: curve));
               var offsetAnimation = animation.drive(tween);
+
               return SlideTransition(position: offsetAnimation, child: child);
             },
           ),
         );
-      } else {
-        // Navigate to the generic DomainScreen for other types
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder:
-                (context) =>
-                    DomainScreen(screenType: screenType, imagePath: imgPath),
-          ),
-        );
+        return;
       }
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder:
+              (context) => DomainScreen(
+                screenType: selectedScreenType,
+                imagePath: imagePath,
+              ),
+        ),
+      );
     }
 
-    // Use Card for a prominent button appearance
-    return Card(
-      elevation: 6.0, // Increased elevation for prominence
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(15.0), // Softer rounded corners
+    return _ZoomButton(
+      onTap: () {
+        navigateToScreen(selectedScreenType, imagePath);
+      },
+      child: Hero(
+        tag: selectedScreenType,
+        child: Card(
+          elevation: 10,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(10),
+
+            child: Image.asset(imagePath, fit: BoxFit.cover),
+          ),
+        ),
       ),
-      clipBehavior: Clip.antiAlias, // Ensures content respects card boundaries
-      child: InkWell(
-        // Provides tap feedback (ripple effect)
-        onTap: () => navigateToScreen(selectedScreenType, imagePath),
-        child: Column(
-          crossAxisAlignment:
-              CrossAxisAlignment.stretch, // Stretch content horizontally
-          children: <Widget>[
-            Expanded(
-              // Image takes up the available space above the label
-              child: Hero(
-                tag: selectedScreenType, // Unique tag for Hero animation
-                child: Image.asset(
-                  imagePath,
-                  fit: BoxFit.cover, // Cover the area nicely
+    );
+  }
+}
+
+class AppBarWidget extends StatelessWidget {
+  const AppBarWidget({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        const SizedBox(height: 20),
+        Row(
+          children: [
+            Hero(
+              tag: 'backButton',
+              child: Align(
+                alignment: Alignment.topLeft,
+                child: Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    onTap: () => Navigator.of(context).pop(),
+                    borderRadius: BorderRadius.circular(50),
+                    child: Container(
+                      padding: const EdgeInsets.all(15),
+                      child: const Icon(
+                        Icons.subdirectory_arrow_left,
+                        color: Colors.white,
+                        size: 60,
+                      ),
+                    ),
+                  ),
                 ),
               ),
             ),
-            Container(
-              // Container for label background and padding
-              padding: const EdgeInsets.symmetric(
-                vertical: 10.0,
-                horizontal: 8.0,
-              ),
-              color: Colors.black.withOpacity(
-                0.6,
-              ), // Semi-transparent background for label
-              child: Text(
-                label,
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                  color:
-                      Colors.white, // White text for contrast on dark overlay
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+
+            // a button to toggle voice on and off
+            const Spacer(),
+            Hero(
+              tag: 'voiceToggle',
+              child: Consumer<TtsHelper>(
+                builder: (context, ttsHelper, child) {
+                  return GestureDetector(
+                    onTap: () {
+                      ttsHelper.toggleVoiceOnOff();
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.all(15),
+                      child: Icon(
+                        ttsHelper.isVoiceOn
+                            ? Icons.volume_up
+                            : Icons.volume_off,
+                        color: Colors.white,
+                        size: 60,
+                      ),
+                    ),
+                  );
+                },
               ),
             ),
           ],
         ),
-      ),
+      ],
     );
   }
 }
@@ -189,47 +200,25 @@ class VoiceToggleWidget extends StatelessWidget {
             onTap: () {
               ttsHelper.toggleVoiceOnOff();
             },
-            child: Stack(
-              fit: StackFit.expand,
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(5),
-                  child: Image.asset(
-                    'assets/images/speakon.png',
-                    fit: BoxFit.contain,
-                  ),
-                ),
-                if (!ttsHelper.isVoiceOn)
-                  CustomPaint(painter: DiagonalLinePainter()),
-              ],
-            ),
+            // child: Stack(
+            //   fit: StackFit.expand,
+            //   children: [
+            //     Container(
+            //       padding: const EdgeInsets.all(5),
+            //       child: Image.asset(
+            //         'assets/images/speakon.png',
+            //         fit: BoxFit.contain,
+            //       ),
+            //     ),
+            //     if (!ttsHelper.isVoiceOn)
+
+            //   ],
+            // ),
           ),
         );
       },
     );
   }
-}
-
-class DiagonalLinePainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint =
-        Paint()
-          ..color = Colors.red
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = 5.0
-          ..strokeCap = StrokeCap.round;
-
-    // Draw a diagonal line from top-left to bottom-right
-    canvas.drawLine(
-      Offset(5, 5),
-      Offset(size.width - 5, size.height - 5),
-      paint,
-    );
-  }
-
-  @override
-  bool shouldRepaint(CustomPainter oldDelegate) => false;
 }
 
 class _ZoomButton extends StatefulWidget {

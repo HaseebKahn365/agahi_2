@@ -2,6 +2,7 @@ import 'package:agahi/consts/screen_types.dart';
 import 'package:agahi/screens/domain_specific/agriculture.dart';
 import 'package:agahi/screens/domain_specific/education.dart';
 import 'package:agahi/screens/domain_specific/health.dart';
+import 'package:agahi/screens/landing_screen.dart';
 import 'package:flutter/material.dart';
 
 class DomainScreen extends StatelessWidget {
@@ -22,8 +23,26 @@ class DomainScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            const SizedBox(height: 20),
+            AppBarWidget(),
+            // const SizedBox(height: 20),
 
+            // Align(
+            //   alignment: Alignment.center,
+            //   child: Hero(
+            //     tag: screenType,
+
+            //     child: Container(
+            //       width: 200,
+            //       height: 200,
+
+            //       decoration: BoxDecoration(
+            //         borderRadius: BorderRadius.circular(10),
+            //         color: Colors.white,
+            //       ),
+            //       child: Image.asset(imagePath, fit: BoxFit.cover),
+            //     ),
+            //   ),
+            // ),
             const SizedBox(height: 50),
             ListViewFor(screenType: screenType, imagePath: imagePath),
 
@@ -50,27 +69,10 @@ class ListViewFor extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: MediaQuery.of(context).size.height * 0.55,
+      height: MediaQuery.of(context).size.height * 0.7,
       child: SingleChildScrollView(
         child: Column(
           children: [
-            Align(
-              alignment: Alignment.center,
-              child: Hero(
-                tag: screenType,
-
-                child: Container(
-                  width: 200,
-                  height: 200,
-
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    color: Colors.white,
-                  ),
-                  child: Image.asset(imagePath, fit: BoxFit.cover),
-                ),
-              ),
-            ),
             const SizedBox(height: 20),
             // Text(
             //   'Explore ${screenType.toString().split('.').last}',
