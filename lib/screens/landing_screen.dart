@@ -1,5 +1,5 @@
 import 'package:agahi/consts/screen_types.dart';
-import 'package:agahi/main.dart';
+import 'package:agahi/l10n/tts_helper_provider.dart';
 import 'package:agahi/screens/domain_screen.dart';
 import 'package:agahi/screens/ecom/ecom_screen.dart';
 import 'package:flutter/material.dart';

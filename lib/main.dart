@@ -1,8 +1,8 @@
+import 'package:agahi/l10n/tts_helper_provider.dart';
 import 'package:agahi/language_support/sentences.dart';
 import 'package:agahi/screens/ecom/ecom_provider.dart';
 import 'package:agahi/screens/landing_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_tts/flutter_tts.dart';
 import 'package:provider/provider.dart';
 
 void main() async {
@@ -41,7 +41,7 @@ class MyApp extends StatelessWidget {
           title: title,
           debugShowCheckedModeBanner: false,
           theme: ThemeData(
-            brightness: Brightness.dark,
+            brightness: Brightness.light,
             primarySwatch: Colors.indigo,
           ),
           // supportedLocales: L10n.all,
@@ -75,11 +75,7 @@ class MyHomePage extends StatelessWidget {
             //A BIGGER APP NAME TEXT
             Text(
               isUrdu ? Sentences.appNameUrdu : Sentences.appNamePashto,
-              style: const TextStyle(
-                fontSize: 32,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-              ),
+              style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 32),
             Text(
@@ -96,15 +92,15 @@ class MyHomePage extends StatelessWidget {
             GestureDetector(
               onTap: () {
                 // Speak the selected language when the button is tapped
-                if (isUrdu) {
-                  TtsHelper().speakAloud(
-                    "${Sentences.appNameUrdu} ${Sentences.welcomeUrdu}",
-                  );
-                } else {
-                  TtsHelper().speakPashto(
-                    "${Sentences.appNamePashto} ${Sentences.welcomePashto}",
-                  );
-                }
+                // if (isUrdu) {
+                //   TtsHelper().speakAloud(
+                //     "${Sentences.appNameUrdu} ${Sentences.welcomeUrdu}",
+                //   );
+                // } else {
+                //   TtsHelper().speakPashto(
+                //     "${Sentences.appNamePashto} ${Sentences.welcomePashto}",
+                //   );
+                // }
               },
               child: GestureDetector(
                 onTap: () {
@@ -204,6 +200,8 @@ class _ToggleContainersState extends State<ToggleContainers> {
           _buildToggleButton(
             label: 'پښتو',
             selected: !_isUrdu,
+            forUrdu: false,
+
             onTap: () {
               setState(() {
                 _isUrdu = false;
@@ -219,10 +217,13 @@ class _ToggleContainersState extends State<ToggleContainers> {
     );
   }
 
+  //for urdu.green[400]! should be the color, for pashto it should be red. if not selected then only outline else fill the color
+
   Widget _buildToggleButton({
     required String label,
     required bool selected,
     required VoidCallback onTap,
+    bool forUrdu = true,
   }) {
     return GestureDetector(
       onTap: onTap,
@@ -232,101 +233,51 @@ class _ToggleContainersState extends State<ToggleContainers> {
         duration: const Duration(milliseconds: 250),
         padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 14),
         decoration: BoxDecoration(
-          color: selected ? Colors.indigo : Colors.grey[800],
+          color:
+              selected
+                  ? (forUrdu ? Colors.green[400]! : Colors.red[200]!)
+                  : Colors.transparent,
           borderRadius: BorderRadius.circular(18),
           boxShadow:
               selected
                   ? [
                     BoxShadow(
-                      color: Colors.indigo.withOpacity(0.4),
+                      color: forUrdu ? Colors.green[400]! : Colors.red[200]!,
                       blurRadius: 12,
                       offset: const Offset(0, 4),
                     ),
                   ]
                   : [],
           border: Border.all(
-            color: selected ? Colors.indigoAccent : Colors.grey[700]!,
-            width: 2,
+            color:
+                selected
+                    ? (forUrdu ? Colors.green[400]! : Colors.red[200]!)
+                    : forUrdu
+                    ? Colors.green[400]!
+                    : Colors.red[200]!,
+            width: 8,
           ),
         ),
-        child: Row(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            const SizedBox(width: 8),
             Text(
               label,
               style: const TextStyle(
-                color: Colors.white,
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
                 fontFamily: 'NotoNaskhArabic',
               ),
             ),
+
+            const SizedBox(height: 8),
+            selected
+                ? Icon(Icons.check_circle, color: Colors.white, size: 40)
+                : const SizedBox.shrink(),
           ],
         ),
       ),
     );
-  }
-}
-
-class TtsHelper extends ChangeNotifier {
-  static final TtsHelper _instance = TtsHelper._internal();
-  factory TtsHelper() => _instance;
-  bool isVoiceOn = true; // Default voice state
-
-  final FlutterTts _tts = FlutterTts();
-  bool _initialized = false;
-
-  TtsHelper._internal();
-
-  Future<void> initialize() async {
-    if (!_initialized) {
-      await _tts.setSpeechRate(0.5);
-      await _tts.setVolume(1.0);
-      await _tts.setPitch(0.9);
-      _initialized = true;
-    }
-  }
-
-  void toggleVoiceOnOff() {
-    isVoiceOn = !isVoiceOn;
-    notifyListeners();
-  }
-
-  Future<void> speakAloud(String sentence) async {
-    if (!_initialized) {
-      await initialize();
-    }
-    if (!isVoiceOn) return; // Don't speak if voice is off
-    await _tts.setLanguage('ur-PK');
-    await _tts.speak(sentence);
-  }
-
-  Future<void> speakPashto(String sentence) async {
-    if (!_initialized) {
-      await initialize();
-    }
-    if (!isVoiceOn) return; // Don't speak if voice is off
-    await _tts.setLanguage('ps-AF');
-    await _tts.speak(sentence);
-  }
-
-  Future<void> speakUrdu(String sentence) async {
-    if (!_initialized) {
-      await initialize();
-    }
-    if (!isVoiceOn) return; // Don't speak if voice is off
-    await _tts.setLanguage('ur-PK');
-    await _tts.speak(sentence);
-  }
-}
-
-//provide for language settings
-
-class LanguageProvider with ChangeNotifier {
-  bool isUrdu = true; // Default language is Urdu
-
-  changeLanguage(bool isUrdu) {
-    this.isUrdu = isUrdu;
-    notifyListeners();
   }
 }
