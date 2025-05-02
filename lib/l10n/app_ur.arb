@@ -13,8 +13,7 @@
     "@farewell": {
         "type": "text",
         "description": "A farewell message in Urdu"
-    }
-
+    },
     "welcome": "خوش آمدید",
     "@welcome": {
         "type": "text",
@@ -29,5 +28,5 @@
     "@error": {
         "type": "text",
         "description": "An error message in Urdu"
-    },
+    }
 }
