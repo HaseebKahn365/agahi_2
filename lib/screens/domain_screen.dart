@@ -2,7 +2,6 @@ import 'package:agahi/consts/screen_types.dart';
 import 'package:agahi/screens/domain_specific/agriculture.dart';
 import 'package:agahi/screens/domain_specific/education.dart';
 import 'package:agahi/screens/domain_specific/health.dart';
-import 'package:agahi/screens/landing_screen.dart';
 import 'package:flutter/material.dart';
 
 class DomainScreen extends StatelessWidget {
@@ -23,7 +22,7 @@ class DomainScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            AppBarWidget(),
+            // AppBarWidget(),
             // const SizedBox(height: 20),
 
             // Align(

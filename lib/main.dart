@@ -55,7 +55,7 @@ class MyApp extends StatelessWidget {
           //   GlobalCupertinoLocalizations.delegate,
           // ],
           // home: MyHomePage(title: title),
-          home: const SplashScreen(), // Use SplashScreen as the initial screen
+          home: const LandingScreen(), // Use SplashScreen as the initial screen
         );
       },
     );
