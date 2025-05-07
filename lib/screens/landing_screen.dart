@@ -245,56 +245,76 @@ class _LandingScreenState extends State<LandingScreen> {
     );
   }
 
-  final carouselController2 = CarouselSliderController();
-
   Widget buildCarousel(ScreenType screenType) {
-    //if screen type is health, return 3 items, else return 4 items
-    int level2Index = 0;
+    return SecondLevelCarousel(
+      screenType: screenType,
+      isSecondLevelOpened: isSecondLevelOpened,
+      onScrollToTop: _scrollToTop,
+    );
+  }
+}
 
-    int getItemCount() {
-      if (screenType == ScreenType.health) {
-        return 3;
-      } else {
-        return 4;
+class SecondLevelCarousel extends StatefulWidget {
+  final ScreenType screenType;
+  final bool isSecondLevelOpened;
+  final VoidCallback onScrollToTop;
+
+  const SecondLevelCarousel({
+    super.key,
+    required this.screenType,
+    required this.isSecondLevelOpened,
+    required this.onScrollToTop,
+  });
+
+  @override
+  State<SecondLevelCarousel> createState() => _SecondLevelCarouselState();
+}
+
+class _SecondLevelCarouselState extends State<SecondLevelCarousel> {
+  int level2Index = 0;
+  // Add controller for the second carousel
+  final CarouselSliderController _secondCarouselController =
+      CarouselSliderController();
+
+  int getItemCount() {
+    if (widget.screenType == ScreenType.health) {
+      return 3;
+    } else {
+      return 4;
+    }
+  }
+
+  String getProperImagePath(int index) {
+    if (widget.screenType == ScreenType.health) {
+      switch (index) {
+        case 0:
+          return 'assets/images/health1.jpg';
+        case 1:
+          return 'assets/images/health2.jpg';
+        case 2:
+          return 'assets/images/health3.jpg';
+        default:
+          return 'assets/images/health1.jpg';
       }
     }
+    return 'assets/images/${widget.screenType.name.toLowerCase()}${index + 1}.png';
+  }
 
-    String getProperImagePath(int index) {
-      if (screenType == ScreenType.health) {
-        switch (index) {
-          case 0:
-            return 'assets/images/health1.jpg';
-          case 1:
-            return 'assets/images/health2.jpg';
-          case 2:
-            return 'assets/images/health3.jpg';
-          default:
-            return 'assets/images/health1.jpg'; // Default image
-        }
-      }
-      return 'assets/images/${screenType.name.toLowerCase()}${index + 1}.png';
-    }
-
-    //propely navigate to the next screen based on the image index
-    void navigateToNextScreen(int index) {
-      Widget screen;
-      if (screenType == ScreenType.health) {
-        switch (index) {
-          case 0:
-            screen = const FeverScreen();
-            break;
-          case 1:
-            screen = const BellyPainScreen();
-            break;
-          case 2:
-            screen = const DoctorScreen();
-            break;
-          default:
-            return;
-        }
-      } else {
-        // Handle other screen types
-        return;
+  void navigateToNextScreen(int index) {
+    Widget screen;
+    if (widget.screenType == ScreenType.health) {
+      switch (index) {
+        case 0:
+          screen = const FeverScreen();
+          break;
+        case 1:
+          screen = const BellyPainScreen();
+          break;
+        case 2:
+          screen = const DoctorScreen();
+          break;
+        default:
+          return;
       }
 
       Navigator.push(
@@ -315,23 +335,26 @@ class _LandingScreenState extends State<LandingScreen> {
         ),
       );
     }
+  }
 
-    String getProperTitleForImage(int index) {
-      if (screenType == ScreenType.health) {
-        switch (index) {
-          case 0:
-            return 'Fever';
-          case 1:
-            return 'Belly Pain';
-          case 2:
-            return 'Doctor';
-          default:
-            return 'Health'; // Default title
-        }
+  String getProperTitleForImage(int index) {
+    if (widget.screenType == ScreenType.health) {
+      switch (index) {
+        case 0:
+          return 'Fever';
+        case 1:
+          return 'Belly Pain';
+        case 2:
+          return 'Doctor';
+        default:
+          return 'Health';
       }
-      return '${screenType.name} Image ${index + 1}';
     }
+    return '${widget.screenType.name} Image ${index + 1}';
+  }
 
+  @override
+  Widget build(BuildContext context) {
     return Column(
       mainAxisSize: MainAxisSize.max,
       children: [
@@ -342,98 +365,91 @@ class _LandingScreenState extends State<LandingScreen> {
             IconButton(
               padding: const EdgeInsets.all(20),
               icon: Image.asset('assets/images/up.png', width: 80, height: 80),
-              onPressed: () {
-                setState(() {
-                  // isSecondLevelOpened = false;
-                  _scrollToTop();
-                  Future.delayed(const Duration(milliseconds: 100), () {
-                    isSecondLevelOpened = false;
-                  });
-                });
-              },
+              onPressed: widget.onScrollToTop,
             ),
-
             Text(
-              screenType.name,
+              widget.screenType.name,
               style: const TextStyle(
                 fontSize: 24,
                 color: Colors.white,
                 fontWeight: FontWeight.bold,
               ),
             ),
-
             IconButton(
               icon: Image.asset(
                 'assets/images/forward.png',
                 width: 80,
                 height: 80,
               ),
-              onPressed: () {
-                // Navigate to the next screen or perform any action
-                navigateToNextScreen(level2Index);
-              },
+              onPressed: () => navigateToNextScreen(level2Index),
             ),
           ],
         ),
-        CarouselSlider.builder(
-              itemCount: getItemCount(),
-              itemBuilder: (context, index, realIndex) {
-                return GestureDetector(
-                  onTap: () {
-                    navigateToNextScreen(index);
-                  },
-                  child: Stack(
-                    children: [
-                      SizedBox(
-                        height: 400,
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(10),
-                          child: Image.asset(
-                            getProperImagePath(index),
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        bottom: 20,
-                        left: 20,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 6,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.black.withOpacity(0.7),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Text(
-                            getProperTitleForImage(index),
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
+        Stack(
+              children: [
+                CarouselSlider.builder(
+                  carouselController:
+                      _secondCarouselController, // Add controller here
+                  itemCount: getItemCount(),
+                  itemBuilder: (context, index, realIndex) {
+                    return GestureDetector(
+                      onTap: () => navigateToNextScreen(index),
+                      child: Stack(
+                        children: [
+                          SizedBox(
+                            height: 400,
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(10),
+                              child: Image.asset(
+                                getProperImagePath(index),
+                                fit: BoxFit.cover,
+                              ),
                             ),
                           ),
-                        ),
+                          Positioned(
+                            bottom: 20,
+                            left: 20,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 6,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.black.withOpacity(0.7),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Text(
+                                getProperTitleForImage(index),
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
+                    );
+                  },
+                  options: CarouselOptions(
+                    height: 400,
+                    autoPlay: false,
+                    enlargeCenterPage: true,
+                    aspectRatio: 16 / 9,
+                    autoPlayCurve: Curves.easeInOutCubic,
+                    autoPlayAnimationDuration: Duration(milliseconds: 1200),
+                    viewportFraction: 0.8,
+                    onPageChanged: (index, reason) {
+                      setState(() {
+                        level2Index = index;
+                      });
+                    },
                   ),
-                );
-              },
-              options: CarouselOptions(
-                height: 400,
-                autoPlay: false,
-                enlargeCenterPage: true,
-                aspectRatio: 16 / 9,
-                autoPlayCurve: Curves.easeInOutCubic,
-                autoPlayAnimationDuration: Duration(milliseconds: 1200),
-                viewportFraction: 0.8,
-                onPageChanged: (index, reason) {
-                  setState(() {
-                    level2Index = index;
-                  });
-                },
-              ),
+                ),
+
+                // Add navigation buttons for the second carousel
+              ],
             )
             .animate()
             .fadeIn(duration: 800.ms, curve: Curves.easeOutCubic)
@@ -444,6 +460,8 @@ class _LandingScreenState extends State<LandingScreen> {
               curve: Curves.easeInOutCubic,
             )
             .scale(begin: const Offset(0.9, 0.9), curve: Curves.easeInOutCubic),
+
+        //add buttons for the second carousel
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -454,7 +472,7 @@ class _LandingScreenState extends State<LandingScreen> {
                 size: 30,
               ),
               onPressed: () {
-                carouselController2.previousPage(
+                _secondCarouselController.previousPage(
                   duration: const Duration(milliseconds: 400),
                   curve: Curves.easeInOutCubic,
                 );
@@ -467,7 +485,7 @@ class _LandingScreenState extends State<LandingScreen> {
                 size: 30,
               ),
               onPressed: () {
-                carouselController2.nextPage(
+                _secondCarouselController.nextPage(
                   duration: const Duration(milliseconds: 400),
                   curve: Curves.easeInOutCubic,
                 );
