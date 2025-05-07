@@ -1,5 +1,6 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 
 //New plan:
 /*
@@ -22,9 +23,11 @@ class LandingScreen extends StatefulWidget {
 
 class _LandingScreenState extends State<LandingScreen> {
   int _currentIndex = 0;
-  String selectedSegment = 'Agriculture'; // Default selection
-  int currentIndex = 0; // Current index of the carousel
+  String selectedSegment = 'Agriculture';
+  int currentIndex = 0;
   final _carouselController = CarouselSliderController();
+  // Add a ScrollController to control scrolling
+  final ScrollController _scrollController = ScrollController();
 
   final List<String> _domains = [
     'assets/images/agri.png',
@@ -33,101 +36,230 @@ class _LandingScreenState extends State<LandingScreen> {
     'assets/images/health.png',
   ];
 
+  bool isSecondLevelOpened = false;
+
+  @override
+  void dispose() {
+    // Dispose the scroll controller when the widget is disposed
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  // Method to smoothly scroll to the bottom
+  void _scrollToBottom() {
+    Future.delayed(const Duration(milliseconds: 100), () {
+      _scrollController.animateTo(
+        _scrollController.position.maxScrollExtent,
+        duration: const Duration(milliseconds: 1200),
+        curve: Curves.easeOutQuint,
+      );
+    });
+  }
+
+  //scroll to top and close the second level
+  void _scrollToTop() {
+    _scrollController.animateTo(
+      _scrollController.position.minScrollExtent,
+      duration: const Duration(milliseconds: 400),
+      curve: Curves.easeOutQuint,
+    );
+    Future.delayed(const Duration(milliseconds: 400), () {
+      setState(() {
+        isSecondLevelOpened = false;
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: double.infinity,
-      child: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              ToggleButtons(
-                isSelected: List.generate(4, (index) => _currentIndex == index),
-                onPressed: (index) {
-                  setState(() {
-                    _currentIndex = index;
-                    _carouselController.animateToPage(index);
-                  });
-                },
-                borderRadius: BorderRadius.circular(8),
-                selectedColor: Colors.white,
-                fillColor: Colors.blue,
-                color: Colors.black,
-                children: const [
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16),
-                    child: Text('Agriculture'),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16),
-                    child: Text('Economy'),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16),
-                    child: Text('Education'),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16),
-                    child: Text('Health'),
-                  ),
-                ],
-              ),
-            ],
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return SingleChildScrollView(
+          controller: _scrollController, // Add the scroll controller here
+          physics: const BouncingScrollPhysics(
+            decelerationRate: ScrollDecelerationRate.fast,
           ),
-          const SizedBox(height: 20),
-          CarouselSlider.builder(
-            carouselController: _carouselController,
-            itemCount: _domains.length,
-            options: CarouselOptions(
-              height: 400,
-              enlargeCenterPage: true,
-              autoPlay: true,
-              aspectRatio: 16 / 9,
-              autoPlayCurve: Curves.fastOutSlowIn,
+          child: ConstrainedBox(
+            constraints: BoxConstraints(minHeight: constraints.maxHeight),
+            child: IntrinsicHeight(
+              child: Container(
+                color: const Color(0xFF2F2F4F),
+                width: double.infinity,
+                child: Column(
+                  mainAxisSize: MainAxisSize.max,
+                  spacing: 40,
+                  children: [
+                    const SizedBox(height: 20),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        ToggleButtons(
+                          isSelected: List.generate(
+                            4,
+                            (index) => _currentIndex == index,
+                          ),
+                          onPressed: (index) {
+                            setState(() {
+                              _currentIndex = index;
+                              _carouselController.animateToPage(
+                                index,
+                                duration: const Duration(milliseconds: 800),
+                                curve: Curves.easeInOutCubic,
+                              );
+                            });
+                          },
+                          borderRadius: BorderRadius.circular(12),
+                          selectedColor: Colors.white,
+                          fillColor: Colors.blue,
+                          color: Colors.grey,
+                          children: const [
+                            Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 12),
+                              child: Text('Agriculture'),
+                            ),
+                            Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 12),
+                              child: Text('Economy'),
+                            ),
+                            Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 12),
+                              child: Text('Education'),
+                            ),
+                            Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 12),
+                              child: Text('Health'),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                    CarouselSlider.builder(
+                      carouselController: _carouselController,
+                      itemCount: _domains.length,
+                      options: CarouselOptions(
+                        height: 400,
+                        enlargeCenterPage: true,
+                        autoPlay: true,
+                        aspectRatio: 16 / 9,
+                        autoPlayCurve: Curves.easeInOutCubic,
+                        enableInfiniteScroll: true,
+                        autoPlayAnimationDuration: const Duration(
+                          milliseconds: 1500,
+                        ),
+                        viewportFraction: 0.7,
+                        onPageChanged: (index, reason) {
+                          setState(() {
+                            _currentIndex = index;
+                          });
+                        },
+                      ),
+                      itemBuilder: (context, index, realIndex) {
+                        return GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              isSecondLevelOpened = !isSecondLevelOpened;
 
-              enableInfiniteScroll: true,
-              autoPlayAnimationDuration: const Duration(milliseconds: 800),
-              viewportFraction: 0.7,
-              onPageChanged: (index, reason) {
+                              // If the second level is now open, scroll to it
+                              if (isSecondLevelOpened) {
+                                _scrollToBottom();
+                              }
+                            });
+                          },
+                          child: Hero(
+                            tag: _domains[index],
+                            child: Card(
+                              elevation: 10,
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(10),
+                                child: Image.asset(
+                                  _domains[index],
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                    const SizedBox(height: 150),
+                    if (isSecondLevelOpened) buildCarousel(),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget buildCarousel() {
+    return Column(
+      mainAxisSize: MainAxisSize.max,
+      children: [
+        const SizedBox(height: 20),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            IconButton(
+              padding: const EdgeInsets.all(20),
+              icon: Image.asset('assets/images/up.png', width: 80, height: 80),
+              onPressed: () {
                 setState(() {
-                  _currentIndex = index;
+                  // isSecondLevelOpened = false;
+                  _scrollToTop();
+                  Future.delayed(const Duration(milliseconds: 100), () {
+                    isSecondLevelOpened = false;
+                  });
                 });
               },
             ),
-            itemBuilder: (context, index, realIndex) {
-              return GestureDetector(
-                onTap: () {
-                  // switch (index) {
-                  //   case 0:
-                  //     Navigator.pushNamed(context, '/agriculture');
-                  //     break;
-                  //   case 1:
-                  //     Navigator.pushNamed(context, '/economy');
-                  //     break;
-                  //   case 2:
-                  //     Navigator.pushNamed(context, '/education');
-                  //     break;
-                  //   case 3:
-                  //     Navigator.pushNamed(context, '/health');
-                  //     break;
-                  // }
-                },
-                child: Hero(
-                  tag: _domains[index],
-                  child: Card(
-                    elevation: 10,
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(10),
-                      child: Image.asset(_domains[index], fit: BoxFit.cover),
+            IconButton(
+              icon: Image.asset(
+                'assets/images/forward.png',
+                width: 80,
+                height: 80,
+              ),
+              onPressed: () {
+                // Navigate to the next screen or perform any action
+              },
+            ),
+          ],
+        ),
+        CarouselSlider.builder(
+              itemCount: 4,
+              itemBuilder: (context, index, realIndex) {
+                return Container(
+                  color: Colors.blue,
+                  child: Center(
+                    child: Text(
+                      'Item $index',
+                      style: TextStyle(fontSize: 24, color: Colors.white),
                     ),
                   ),
-                ),
-              );
-            },
-          ),
-        ],
-      ),
+                );
+              },
+              options: CarouselOptions(
+                height: 400,
+                autoPlay: true,
+                enlargeCenterPage: true,
+                aspectRatio: 16 / 9,
+                autoPlayCurve: Curves.easeInOutCubic,
+                autoPlayAnimationDuration: Duration(milliseconds: 1200),
+                viewportFraction: 0.8,
+              ),
+            )
+            .animate()
+            .fadeIn(duration: 800.ms, curve: Curves.easeOutCubic)
+            .move(
+              begin: const Offset(0, 0.1),
+              end: const Offset(0, 0),
+              duration: 800.ms,
+              curve: Curves.easeInOutCubic,
+            )
+            .scale(begin: const Offset(0.9, 0.9), curve: Curves.easeInOutCubic),
+        const SizedBox(height: 200),
+      ],
     );
   }
 }
