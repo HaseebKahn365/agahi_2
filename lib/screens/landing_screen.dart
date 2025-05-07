@@ -1,3 +1,5 @@
+import 'package:agahi/consts/screen_types.dart';
+import 'package:agahi/screens/health_screens.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -10,7 +12,7 @@ lets first convert the landing screen to carousel
 
 //at the top there should be 4 segmented buttons to controll the carousel. all in alphabetical order
 // 1. Agriculture
-// 2. Economy
+// 2. Ecommerce
 // 3. Education
 // 4. Health
 
@@ -74,126 +76,242 @@ class _LandingScreenState extends State<LandingScreen> {
     });
   }
 
+  // Method to get the domain type based on the current index
+  ScreenType getDomainType(int index) {
+    switch (index) {
+      case 0:
+        return ScreenType.agriculture;
+      case 1:
+        return ScreenType.economy;
+      case 2:
+        return ScreenType.education;
+      case 3:
+        return ScreenType.health;
+      default:
+        return ScreenType.education; // Default case
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        return SingleChildScrollView(
-          controller: _scrollController, // Add the scroll controller here
-          physics: const BouncingScrollPhysics(
-            decelerationRate: ScrollDecelerationRate.fast,
-          ),
-          child: ConstrainedBox(
-            constraints: BoxConstraints(minHeight: constraints.maxHeight),
-            child: IntrinsicHeight(
-              child: Container(
-                color: const Color(0xFF2F2F4F),
-                width: double.infinity,
-                child: Column(
-                  mainAxisSize: MainAxisSize.max,
-                  spacing: 40,
-                  children: [
-                    const SizedBox(height: 20),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        ToggleButtons(
-                          isSelected: List.generate(
-                            4,
-                            (index) => _currentIndex == index,
+    return Scaffold(
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          return SingleChildScrollView(
+            controller: _scrollController, // Add the scroll controller here
+            physics: const BouncingScrollPhysics(
+              decelerationRate: ScrollDecelerationRate.fast,
+            ),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(minHeight: constraints.maxHeight),
+              child: IntrinsicHeight(
+                child: Container(
+                  color: const Color(0xFF2F2F4F),
+                  width: double.infinity,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.max,
+                    spacing: 40,
+                    children: [
+                      const SizedBox(height: 20),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          ToggleButtons(
+                            isSelected: List.generate(
+                              4,
+                              (index) => _currentIndex == index,
+                            ),
+                            onPressed: (index) {
+                              setState(() {
+                                _currentIndex = index;
+                                _carouselController.animateToPage(
+                                  index,
+                                  duration: const Duration(milliseconds: 800),
+                                  curve: Curves.easeInOutCubic,
+                                );
+                              });
+                            },
+                            borderRadius: BorderRadius.circular(12),
+                            selectedColor: Colors.white,
+                            fillColor: Colors.blue,
+                            color: Colors.grey,
+                            children: const [
+                              Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 12),
+                                child: Text('Agriculture'),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 12),
+                                child: Text('Ecommerce'),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 12),
+                                child: Text('Education'),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 12),
+                                child: Text('Health'),
+                              ),
+                            ],
                           ),
-                          onPressed: (index) {
+                        ],
+                      ),
+                      CarouselSlider.builder(
+                        carouselController: _carouselController,
+                        itemCount: _domains.length,
+                        options: CarouselOptions(
+                          height: 400,
+                          enlargeCenterPage: true,
+                          autoPlay: false,
+                          aspectRatio: 16 / 9,
+                          autoPlayCurve: Curves.easeInOutCubic,
+                          enableInfiniteScroll: true,
+                          autoPlayAnimationDuration: const Duration(
+                            milliseconds: 1500,
+                          ),
+                          viewportFraction: 0.7,
+                          onPageChanged: (index, reason) {
                             setState(() {
                               _currentIndex = index;
-                              _carouselController.animateToPage(
-                                index,
-                                duration: const Duration(milliseconds: 800),
-                                curve: Curves.easeInOutCubic,
-                              );
                             });
                           },
-                          borderRadius: BorderRadius.circular(12),
-                          selectedColor: Colors.white,
-                          fillColor: Colors.blue,
-                          color: Colors.grey,
-                          children: const [
-                            Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 12),
-                              child: Text('Agriculture'),
-                            ),
-                            Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 12),
-                              child: Text('Economy'),
-                            ),
-                            Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 12),
-                              child: Text('Education'),
-                            ),
-                            Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 12),
-                              child: Text('Health'),
-                            ),
-                          ],
                         ),
-                      ],
-                    ),
-                    CarouselSlider.builder(
-                      carouselController: _carouselController,
-                      itemCount: _domains.length,
-                      options: CarouselOptions(
-                        height: 400,
-                        enlargeCenterPage: true,
-                        autoPlay: true,
-                        aspectRatio: 16 / 9,
-                        autoPlayCurve: Curves.easeInOutCubic,
-                        enableInfiniteScroll: true,
-                        autoPlayAnimationDuration: const Duration(
-                          milliseconds: 1500,
-                        ),
-                        viewportFraction: 0.7,
-                        onPageChanged: (index, reason) {
-                          setState(() {
-                            _currentIndex = index;
-                          });
-                        },
-                      ),
-                      itemBuilder: (context, index, realIndex) {
-                        return GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              // If the second level is now open, scroll to it
-                              _scrollToBottom();
-                            });
-                          },
-                          child: Hero(
-                            tag: _domains[index],
-                            child: Card(
-                              elevation: 10,
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(10),
-                                child: Image.asset(
-                                  _domains[index],
-                                  fit: BoxFit.cover,
+                        itemBuilder: (context, index, realIndex) {
+                          return GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                // If the second level is now open, scroll to it
+                                _scrollToBottom();
+                              });
+                            },
+                            child: Hero(
+                              tag: _domains[index],
+                              child: Card(
+                                elevation: 10,
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(10),
+                                  child: Image.asset(
+                                    _domains[index],
+                                    fit: BoxFit.cover,
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
-                        );
-                      },
-                    ),
-                    const SizedBox(height: 150),
-                    if (isSecondLevelOpened) buildCarousel(),
-                  ],
+                          );
+                        },
+                      ),
+                      const SizedBox(height: 150),
+                      if (isSecondLevelOpened)
+                        buildCarousel(getDomainType(_currentIndex)),
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-        );
-      },
+          );
+        },
+      ),
     );
   }
 
-  Widget buildCarousel() {
+  Widget buildCarousel(ScreenType screenType) {
+    //if screen type is health, return 3 items, else return 4 items
+
+    int getItemCount() {
+      if (screenType == ScreenType.health) {
+        return 3;
+      } else {
+        return 4;
+      }
+    }
+
+    String getProperImagePath(int index) {
+      if (screenType == ScreenType.health) {
+        switch (index) {
+          case 0:
+            return 'assets/images/health1.jpg';
+          case 1:
+            return 'assets/images/health2.jpg';
+          case 2:
+            return 'assets/images/health3.jpg';
+          default:
+            return 'assets/images/health1.jpg'; // Default image
+        }
+      }
+      return 'assets/images/${screenType.name.toLowerCase()}${index + 1}.png';
+    }
+
+    //propely navigate to the next screen based on the image index
+    void navigateToNextScreen(int index) {
+      // Implement your navigation logic here
+      if (screenType == ScreenType.health) {
+        switch (index) {
+          case 0:
+            // Navigate to the first health screen
+            Navigator.push(
+              context,
+              PageRouteBuilder(
+                pageBuilder:
+                    (context, animation, secondaryAnimation) =>
+                        const FeverScreen(),
+                transitionsBuilder: (
+                  context,
+                  animation,
+                  secondaryAnimation,
+                  child,
+                ) {
+                  const begin = Offset(1.0, 0.0);
+                  const end = Offset.zero;
+                  const curve = Curves.easeInOut;
+                  var tween = Tween(
+                    begin: begin,
+                    end: end,
+                  ).chain(CurveTween(curve: curve));
+                  var offsetAnimation = animation.drive(tween);
+                  return SlideTransition(
+                    position: offsetAnimation,
+                    child: child,
+                  );
+                },
+              ),
+            );
+            break;
+          case 1:
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const BellyPainScreen()),
+            );
+            break;
+          case 2:
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const DoctorScreen()),
+            );
+            break;
+          default:
+            break;
+        }
+      } else {
+        // Handle other screen types
+      }
+    }
+
+    String getProperTitleForImage(int index) {
+      if (screenType == ScreenType.health) {
+        switch (index) {
+          case 0:
+            return 'Fever';
+          case 1:
+            return 'Belly Pain';
+          case 2:
+            return 'Doctor';
+          default:
+            return 'Health'; // Default title
+        }
+      }
+      return '${screenType.name} Image ${index + 1}';
+    }
+
     return Column(
       mainAxisSize: MainAxisSize.max,
       children: [
@@ -214,6 +332,16 @@ class _LandingScreenState extends State<LandingScreen> {
                 });
               },
             ),
+
+            Text(
+              screenType.name,
+              style: const TextStyle(
+                fontSize: 24,
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+
             IconButton(
               icon: Image.asset(
                 'assets/images/forward.png',
@@ -222,31 +350,69 @@ class _LandingScreenState extends State<LandingScreen> {
               ),
               onPressed: () {
                 // Navigate to the next screen or perform any action
+                navigateToNextScreen(currentIndex);
               },
             ),
           ],
         ),
         CarouselSlider.builder(
-              itemCount: 4,
+              itemCount: getItemCount(),
               itemBuilder: (context, index, realIndex) {
-                return Container(
-                  color: Colors.blue,
-                  child: Center(
-                    child: Text(
-                      'Item $index',
-                      style: TextStyle(fontSize: 24, color: Colors.white),
-                    ),
+                return GestureDetector(
+                  onTap: () {
+                    navigateToNextScreen(index);
+                  },
+                  child: Stack(
+                    children: [
+                      SizedBox(
+                        height: 400,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(10),
+                          child: Image.asset(
+                            getProperImagePath(index),
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        bottom: 20,
+                        left: 20,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 6,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.black.withOpacity(0.7),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Text(
+                            getProperTitleForImage(index),
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 );
               },
               options: CarouselOptions(
                 height: 400,
-                autoPlay: true,
+                autoPlay: false,
                 enlargeCenterPage: true,
                 aspectRatio: 16 / 9,
                 autoPlayCurve: Curves.easeInOutCubic,
                 autoPlayAnimationDuration: Duration(milliseconds: 1200),
                 viewportFraction: 0.8,
+                onPageChanged: (index, reason) {
+                  setState(() {
+                    currentIndex = index;
+                  });
+                },
               ),
             )
             .animate()
@@ -263,6 +429,47 @@ class _LandingScreenState extends State<LandingScreen> {
     );
   }
 }
+
+//
+
+//
+
+//
+
+//
+
+//!create a few basic screens for the health domain
+
+//fever screen
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//
+
+
+//
+
+
+//
+
+
+//
 
 // class LandingScreen extends StatelessWidget {
 //   const LandingScreen({super.key});
