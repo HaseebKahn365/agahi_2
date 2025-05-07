@@ -112,7 +112,7 @@ class _LandingScreenState extends State<LandingScreen> {
                     mainAxisSize: MainAxisSize.max,
                     spacing: 40,
                     children: [
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 100),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -200,6 +200,37 @@ class _LandingScreenState extends State<LandingScreen> {
                           );
                         },
                       ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          IconButton(
+                            icon: const Icon(
+                              Icons.arrow_circle_left_sharp,
+                              color: Colors.white,
+                              size: 30,
+                            ),
+                            onPressed: () {
+                              _carouselController.previousPage(
+                                duration: const Duration(milliseconds: 400),
+                                curve: Curves.easeInOutCubic,
+                              );
+                            },
+                          ),
+                          IconButton(
+                            icon: const Icon(
+                              Icons.arrow_circle_right_sharp,
+                              color: Colors.white,
+                              size: 30,
+                            ),
+                            onPressed: () {
+                              _carouselController.nextPage(
+                                duration: const Duration(milliseconds: 400),
+                                curve: Curves.easeInOutCubic,
+                              );
+                            },
+                          ),
+                        ],
+                      ),
                       const SizedBox(height: 150),
                       if (isSecondLevelOpened)
                         buildCarousel(getDomainType(_currentIndex)),
@@ -214,8 +245,11 @@ class _LandingScreenState extends State<LandingScreen> {
     );
   }
 
+  final carouselController2 = CarouselSliderController();
+
   Widget buildCarousel(ScreenType screenType) {
     //if screen type is health, return 3 items, else return 4 items
+    int level2Index = 0;
 
     int getItemCount() {
       if (screenType == ScreenType.health) {
@@ -243,57 +277,43 @@ class _LandingScreenState extends State<LandingScreen> {
 
     //propely navigate to the next screen based on the image index
     void navigateToNextScreen(int index) {
-      // Implement your navigation logic here
+      Widget screen;
       if (screenType == ScreenType.health) {
         switch (index) {
           case 0:
-            // Navigate to the first health screen
-            Navigator.push(
-              context,
-              PageRouteBuilder(
-                pageBuilder:
-                    (context, animation, secondaryAnimation) =>
-                        const FeverScreen(),
-                transitionsBuilder: (
-                  context,
-                  animation,
-                  secondaryAnimation,
-                  child,
-                ) {
-                  const begin = Offset(1.0, 0.0);
-                  const end = Offset.zero;
-                  const curve = Curves.easeInOut;
-                  var tween = Tween(
-                    begin: begin,
-                    end: end,
-                  ).chain(CurveTween(curve: curve));
-                  var offsetAnimation = animation.drive(tween);
-                  return SlideTransition(
-                    position: offsetAnimation,
-                    child: child,
-                  );
-                },
-              ),
-            );
+            screen = const FeverScreen();
             break;
           case 1:
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const BellyPainScreen()),
-            );
+            screen = const BellyPainScreen();
             break;
           case 2:
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const DoctorScreen()),
-            );
+            screen = const DoctorScreen();
             break;
           default:
-            break;
+            return;
         }
       } else {
         // Handle other screen types
+        return;
       }
+
+      Navigator.push(
+        context,
+        PageRouteBuilder(
+          pageBuilder: (context, animation, secondaryAnimation) => screen,
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            const begin = Offset(1.0, 0.0);
+            const end = Offset.zero;
+            const curve = Curves.easeInOut;
+            var tween = Tween(
+              begin: begin,
+              end: end,
+            ).chain(CurveTween(curve: curve));
+            var offsetAnimation = animation.drive(tween);
+            return SlideTransition(position: offsetAnimation, child: child);
+          },
+        ),
+      );
     }
 
     String getProperTitleForImage(int index) {
@@ -350,7 +370,7 @@ class _LandingScreenState extends State<LandingScreen> {
               ),
               onPressed: () {
                 // Navigate to the next screen or perform any action
-                navigateToNextScreen(currentIndex);
+                navigateToNextScreen(level2Index);
               },
             ),
           ],
@@ -410,7 +430,7 @@ class _LandingScreenState extends State<LandingScreen> {
                 viewportFraction: 0.8,
                 onPageChanged: (index, reason) {
                   setState(() {
-                    currentIndex = index;
+                    level2Index = index;
                   });
                 },
               ),
@@ -424,6 +444,37 @@ class _LandingScreenState extends State<LandingScreen> {
               curve: Curves.easeInOutCubic,
             )
             .scale(begin: const Offset(0.9, 0.9), curve: Curves.easeInOutCubic),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            IconButton(
+              icon: const Icon(
+                Icons.arrow_circle_left_sharp,
+                color: Colors.white,
+                size: 30,
+              ),
+              onPressed: () {
+                carouselController2.previousPage(
+                  duration: const Duration(milliseconds: 400),
+                  curve: Curves.easeInOutCubic,
+                );
+              },
+            ),
+            IconButton(
+              icon: const Icon(
+                Icons.arrow_circle_right_sharp,
+                color: Colors.white,
+                size: 30,
+              ),
+              onPressed: () {
+                carouselController2.nextPage(
+                  duration: const Duration(milliseconds: 400),
+                  curve: Curves.easeInOutCubic,
+                );
+              },
+            ),
+          ],
+        ),
         const SizedBox(height: 200),
       ],
     );
