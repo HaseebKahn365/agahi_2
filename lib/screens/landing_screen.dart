@@ -47,6 +47,10 @@ class _LandingScreenState extends State<LandingScreen> {
 
   // Method to smoothly scroll to the bottom
   void _scrollToBottom() {
+    setState(() {
+      isSecondLevelOpened = false;
+    });
+    isSecondLevelOpened = true;
     Future.delayed(const Duration(milliseconds: 100), () {
       _scrollController.animateTo(
         _scrollController.position.maxScrollExtent,
@@ -157,12 +161,8 @@ class _LandingScreenState extends State<LandingScreen> {
                         return GestureDetector(
                           onTap: () {
                             setState(() {
-                              isSecondLevelOpened = !isSecondLevelOpened;
-
                               // If the second level is now open, scroll to it
-                              if (isSecondLevelOpened) {
-                                _scrollToBottom();
-                              }
+                              _scrollToBottom();
                             });
                           },
                           child: Hero(
